@@ -30,29 +30,40 @@ route.get('/user/:userid', function(req,res){
   })
 })
 
-
 route.post('/user',(req,res)=>{
-  model.UserName.findOne({where: {UserName:req.body.UserName}}).then(entry=>{
-    if(entry == null){
-      model.UserName.create({
-        UserName:req.body.UserName})
-      .then((temp) => {
-        model.Contact.create({
-          userid:req.body.connectid,
-          contactNumber:req.body.contactNumber,
-          address:req.body.address
-        })
-        .then(()=>{
-          res.end(JSON.stringify(req.body));
-        })
-      });
+  model.Contact.findOne({where: {contactNumber:req.body.contactNumber}}).then(token1=>{
+    if(token1===null){
+      model.UserName.findOne({where: {aadhaarNumber:req.body.aadhaarNumber}}).then(token2=>{
+        if(token2 ===null){
+          model.UserName.create({
+            UserName:req.body.UserName,
+            aadhaarNumber:req.body.aadhaarNumber
+          })
+          .then((temp) => {
+            model.Contact.create({
+              userid:temp.userid,
+              contactNumber:req.body.contactNumber,
+              address:req.body.address
+            })
+            .then(()=>{
+              res.send('Contact Number updated with new Aadhaar ID.');
+            })
+          });
+        }
+        else{
+          model.Contact.create({
+            userid:token2.userid,
+            contactNumber:req.body.contactNumber,
+            address:req.body.address
+          })
+          .then(()=>{
+            res.send('Contact Number updated on existing Aadhaar number.');
+          })
+        }
+      })
     }
     else{
-      model.Contact.create({
-        userid: req.body.userid,
-        contactNumber: req.body.contactNumber,
-        address:req.body.address
-      })
+      res.send('Contact Number already exists.')
     }
   })
 });

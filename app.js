@@ -4,12 +4,12 @@ const connection = require('./sequelizeConnet')
 const app = express();
 const port = 3000;
 var route = require('./routers');
- 
+var cors = require('cors');
+app.use(cors()) 
 
 app.set('view engine', 'ejs');
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
-
 
 function main(){
   connection.authenticate()
